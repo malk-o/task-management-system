@@ -25,6 +25,9 @@ function createRecurrenceService({
   // A rule is due on `date` when its strategy's next occurrence after the previous day is `date`.
   const isDueOn = (rule, date) => STRATEGIES[rule.frequency].next(dayBefore(date), rule) === date;
 
+  // endDate is inclusive: an occurrence ON the end date is still created, none after it.
+  const hasEnded = (rule, date) => rule.endDate !== null && date > rule.endDate;
+
   const alreadyGenerated = (rule, date) =>
     taskRepository.findByRuleAndOccurrenceDate(rule.id, date) !== null;
 
@@ -47,6 +50,7 @@ function createRecurrenceService({
     generateDue(date) {
       return runInTransaction(() => recurrenceRuleRepository.findAll()
         .filter((rule) => isDueOn(rule, date))
+        .filter((rule) => !hasEnded(rule, date))
         .filter((rule) => !alreadyGenerated(rule, date))
         .map((rule) => generateOccurrence(rule, date))
         .length);
