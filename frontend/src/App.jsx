@@ -1,18 +1,22 @@
 import { useEffect, useState } from 'react';
 import { api } from './api.js';
+import { initials } from './time.js';
+import {
+  BrandMark, IconBell, IconChart, IconClipboard, IconFile, IconRepeat,
+} from './components/Icons.jsx';
 import NotificationsPage from './pages/NotificationsPage.jsx';
 import ProjectsPage from './pages/ProjectsPage.jsx';
 import RecurringRulesPage from './pages/RecurringRulesPage.jsx';
 import TaskDetailsPage from './pages/TaskDetailsPage.jsx';
 import ReportsPage from './pages/ReportsPage.jsx';
 
-// Each member adds their page here. Owner in brackets.
-const TABS = [
-  { id: 'projects', label: 'Projects & Tasks', owner: 'B' },
-  { id: 'recurring', label: 'Recurring', owner: 'A' },
-  { id: 'details', label: 'Task Details', owner: 'C / D' },
-  { id: 'reports', label: 'Reports', owner: 'C' },
-  { id: 'notifications', label: 'Notifications', owner: 'E' },
+// Each member adds their page here. Owner in brackets. A page renders its own <section> with an <h2> title.
+const NAV = [
+  { id: 'projects', label: 'Projects & Tasks', Icon: IconClipboard }, // Member B
+  { id: 'recurring', label: 'Recurring', Icon: IconRepeat }, // Member A
+  { id: 'details', label: 'Task Details', Icon: IconFile }, // Members C and D
+  { id: 'reports', label: 'Reports', Icon: IconChart }, // Member C
+  { id: 'notifications', label: 'Notifications', Icon: IconBell }, // Member E
 ];
 
 export default function App() {
@@ -22,17 +26,17 @@ export default function App() {
   const [unread, setUnread] = useState(0);
   const [error, setError] = useState('');
 
-  // Load the seeded users for the "log in as" picker.
+  // Load the seeded users for the "signed in as" picker.
   useEffect(() => {
     api('/users')
       .then((list) => {
         setUsers(list);
         if (list.length > 0) setUserId(list[0].id);
       })
-      .catch((e) => setError(`Cannot reach the backend: ${e.message}`));
+      .catch((e) => setError(`Cannot reach the backend: ${e.message}. Is "npm start" running in the backend folder?`));
   }, []);
 
-  // Poll the unread count so the bell updates without a page refresh.
+  // Poll the unread count so the badge updates without a page refresh.
   useEffect(() => {
     if (!userId) return undefined;
     const load = () =>
@@ -52,36 +56,51 @@ export default function App() {
     notifications: <NotificationsPage userId={userId} onChange={setUnread} />,
   }[tab];
 
+  const currentUser = users.find((u) => u.id === userId);
+
   return (
-    <div className="app">
-      <header className="topbar">
-        <h1>Task &amp; Project Management</h1>
-        <div className="topbar-right">
-          <button className="bell" onClick={() => setTab('notifications')} aria-label="Notifications">
-            🔔{unread > 0 && <span className="badge">{unread}</span>}
-          </button>
-          <label>
-            Logged in as{' '}
-            <select value={userId ?? ''} onChange={(e) => setUserId(Number(e.target.value))}>
-              {users.map((u) => (
-                <option key={u.id} value={u.id}>{u.name}</option>
-              ))}
-            </select>
-          </label>
+    <div className="shell">
+      <aside className="sidebar">
+        <div className="brand">
+          <BrandMark />
+          <span className="brand-name">Task &amp; Project<br />Management</span>
         </div>
-      </header>
 
-      <nav className="tabs">
-        {TABS.map((t) => (
-          <button key={t.id} className={tab === t.id ? 'active' : ''} onClick={() => setTab(t.id)}>
-            {t.label}
-          </button>
-        ))}
-      </nav>
+        <nav className="nav" aria-label="Main">
+          {NAV.map(({ id, label, Icon }) => (
+            <button
+              key={id}
+              type="button"
+              aria-current={tab === id ? 'page' : undefined}
+              onClick={() => setTab(id)}
+            >
+              <Icon />
+              <span>{label}</span>
+              {id === 'notifications' && unread > 0 && (
+                <span className="nav-badge" aria-label={`${unread} unread`}>{unread}</span>
+              )}
+            </button>
+          ))}
+        </nav>
 
-      <main>
+        <div className="account">
+          <div className="account-row">
+            <span className="avatar" aria-hidden="true">{initials(currentUser?.name)}</span>
+            <label>
+              <span className="account-label">Signed in as</span>
+              <select value={userId ?? ''} onChange={(e) => setUserId(Number(e.target.value))}>
+                {users.map((u) => (
+                  <option key={u.id} value={u.id}>{u.name}</option>
+                ))}
+              </select>
+            </label>
+          </div>
+        </div>
+      </aside>
+
+      <main className="content">
         {error && <p className="error">{error}</p>}
-        {userId ? page : !error && <p>Loading…</p>}
+        {userId ? page : !error && <p className="muted">Loading…</p>}
       </main>
     </div>
   );
