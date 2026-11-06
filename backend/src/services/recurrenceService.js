@@ -3,6 +3,7 @@
 const { DailyRecurrenceStrategy } = require('../strategies/dailyRecurrenceStrategy');
 const { WeeklyRecurrenceStrategy } = require('../strategies/weeklyRecurrenceStrategy');
 const { MonthlyRecurrenceStrategy } = require('../strategies/monthlyRecurrenceStrategy');
+const { InvalidRequestError, NotFoundError } = require('../errors/errors');
 
 const STRATEGIES = {
   DAILY: new DailyRecurrenceStrategy(),
@@ -82,9 +83,19 @@ function createRecurrenceService({
     createRule({
       templateTaskId, frequency, daysOfWeek = null, dayOfMonth = null, endDate = null,
     }) {
+      if (!STRATEGIES[frequency]) {
+        throw new InvalidRequestError('frequency must be DAILY, WEEKLY or MONTHLY');
+      }
+      if (taskRepository.findById(templateTaskId) === null) {
+        throw new NotFoundError('Template task not found');
+      }
       return recurrenceRuleRepository.save({
         templateTaskId, frequency, daysOfWeek, dayOfMonth, endDate,
       });
+    },
+
+    listRules() {
+      return recurrenceRuleRepository.findAll();
     },
   };
 }
