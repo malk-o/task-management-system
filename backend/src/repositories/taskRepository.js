@@ -19,6 +19,8 @@ const toTask = (row) => (row
     assigneeId: row.assignee_id,
     dueSoonNotified: row.due_soon_notified === 1,
     createdAt: row.created_at,
+    ruleId: row.rule_id,
+    occurrenceDate: row.occurrence_date,
   }
   : null);
 
@@ -31,8 +33,8 @@ function createTaskRepository(db) {
     const createdAt = iso(task.createdAt) ?? new Date().toISOString();
     const result = db.prepare(
       `INSERT INTO tasks (title, description, priority, due_date, status, project_id,
-                          assignee_id, due_soon_notified, created_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+                          assignee_id, due_soon_notified, created_at, rule_id, occurrence_date)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     ).run(
       task.title,
       task.description ?? null,
@@ -43,6 +45,8 @@ function createTaskRepository(db) {
       task.assigneeId ?? null,
       task.dueSoonNotified ? 1 : 0,
       createdAt,
+      task.ruleId ?? null,
+      task.occurrenceDate ?? null,
     );
     return toTask(db.prepare('SELECT * FROM tasks WHERE id = ?').get(Number(result.lastInsertRowid)));
   }

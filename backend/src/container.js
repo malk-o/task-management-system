@@ -1,3 +1,4 @@
+
 'use strict';
 
 const { createTransactionRunner } = require('./db/database');
@@ -6,6 +7,7 @@ const { createProjectRepository } = require('./repositories/projectRepository');
 const { createProjectMemberRepository } = require('./repositories/projectMemberRepository');
 const { createTaskRepository } = require('./repositories/taskRepository');
 const { createNotificationRepository } = require('./repositories/notificationRepository');
+const { createRecurrenceRuleRepository } = require('./repositories/recurrenceRuleRepository');
 const { SynchronousEventPublisher } = require('./events/eventPublisher');
 const { createNotificationService } = require('./services/notificationService');
 const { createDueSoonService } = require('./services/dueSoonService');
@@ -29,6 +31,7 @@ function buildContainer({ db, clock, config }) {
   const projectMemberRepository = createProjectMemberRepository(db);
   const taskRepository = createTaskRepository(db);
   const notificationRepository = createNotificationRepository(db);
+  const recurrenceRuleRepository = createRecurrenceRuleRepository(db);
 
   // Observer: publisher + listeners
   const eventPublisher = new SynchronousEventPublisher();
@@ -64,6 +67,7 @@ function buildContainer({ db, clock, config }) {
     projectMemberRepository,
     taskRepository,
     notificationRepository,
+    recurrenceRuleRepository,
     eventPublisher,
     accessControlService,
     notificationService,
