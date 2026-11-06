@@ -1,0 +1,57 @@
+'use strict';
+
+const { describe, it, beforeEach } = require('node:test');
+const assert = require('node:assert/strict');
+const { createRecurrenceService } = require('../../src/services/recurrenceService');
+
+/** Fake dependencies: no database, no real factory. */
+function buildFakes() {
+  const template = {
+    id: 1, projectId: 1, title: 'Weekly report', description: 'Send the report',
+    priority: 'HIGH', assigneeId: 2, dueDate: '2026-11-10T12:00:00.000Z',
+  };
+  const rules = [
+    { id: 1, templateTaskId: 1, frequency: 'DAILY', daysOfWeek: null, dayOfMonth: null, endDate: null },
+  ];
+  const savedTasks = [];
+
+  const taskRepository = {
+    findById: (id) => (id === template.id ? template : null),
+    findByRuleAndOccurrenceDate: (ruleId, date) =>
+      savedTasks.find((t) => t.ruleId === ruleId && t.occurrenceDate === date) ?? null,
+    save: (task) => {
+      const saved = { ...task, id: 100 + savedTasks.length };
+      savedTasks.push(saved);
+      return saved;
+    },
+  };
+  const recurrenceRuleRepository = { findAll: () => rules };
+  const taskFactory = { create: (fields) => ({ ...fields, status: 'TODO' }) };
+  const runInTransaction = (work) => work();
+
+  return { template, rules, savedTasks, taskRepository, recurrenceRuleRepository, taskFactory, runInTransaction };
+}
+
+describe('RecurrenceService (unit)', () => {
+  let fakes;
+  let service;
+
+  beforeEach(() => {
+    fakes = buildFakes();
+    service = createRecurrenceService({
+      recurrenceRuleRepository: fakes.recurrenceRuleRepository,
+      taskRepository: fakes.taskRepository,
+      taskFactory: fakes.taskFactory,
+      runInTransaction: fakes.runInTransaction,
+    });
+  });
+
+  it('sameOccurrenceTwice_createsOnlyOneTask', () => {
+    const firstRun = service.generateDue('2026-11-11');
+    const secondRun = service.generateDue('2026-11-11');
+
+    assert.equal(firstRun, 1);
+    assert.equal(secondRun, 0);
+    assert.equal(fakes.savedTasks.length, 1);
+  });
+});
