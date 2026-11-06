@@ -80,6 +80,11 @@ function createTaskRepository(db) {
     findAll() {
       return db.prepare('SELECT * FROM tasks ORDER BY id').all().map(toTask);
     },
+    findByRuleAndOccurrenceDate(ruleId, occurrenceDate) {
+      return toTask(db.prepare(
+        'SELECT * FROM tasks WHERE rule_id = ? AND occurrence_date = ?',
+      ).get(ruleId, occurrenceDate));
+    },
     /**
      * FR5: tasks due between `from` and `to` (ISO strings), not yet notified,
      * with an assignee, and not in the excluded status (Done).
