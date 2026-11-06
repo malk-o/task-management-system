@@ -6,6 +6,7 @@ const { seedDemoData } = require('./db/seed');
 const { buildContainer } = require('./container');
 const { createApp } = require('./app');
 const { startDueSoonCheckJob } = require('./scheduler/dueSoonCheckJob');
+const { startRecurrenceJob } = require('./scheduler/recurrenceJob');
 const { systemClock } = require('./util/clock');
 
 const config = loadConfig();
@@ -19,6 +20,12 @@ if (config.seedData) {
 startDueSoonCheckJob({
   dueSoonService: container.dueSoonService,
   intervalMs: config.dueSoonCheckIntervalMs,
+});
+
+startRecurrenceJob({
+  recurrenceService: container.recurrenceService,
+  clock: systemClock,
+  intervalMs: config.recurrenceCheckIntervalMs,
 });
 
 createApp(container).listen(config.port, () => {

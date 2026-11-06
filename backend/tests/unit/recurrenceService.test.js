@@ -25,7 +25,14 @@ function buildFakes() {
       return saved;
     },
   };
-  const recurrenceRuleRepository = { findAll: () => rules };
+  const recurrenceRuleRepository = {
+    findAll: () => rules,
+    save: (rule) => {
+      const saved = { id: 50 + rules.length, endDate: null, daysOfWeek: null, dayOfMonth: null, ...rule };
+      rules.push(saved);
+      return saved;
+    },
+  };
   const taskFactory = { create: (fields) => ({ ...fields, status: 'TODO' }) };
   const runInTransaction = (work) => work();
 
@@ -96,5 +103,15 @@ describe('RecurrenceService (unit)', () => {
     });
 
     assert.deepEqual(fakes.savedTasks.map((t) => t.occurrenceDate), days);
+  });
+
+  it('createRule_savesRuleForExistingTemplateTask', () => {
+    const rule = service.createRule({
+      templateTaskId: 1, frequency: 'WEEKLY', daysOfWeek: [1, 4],
+    });
+
+    assert.equal(rule.templateTaskId, 1);
+    assert.equal(rule.frequency, 'WEEKLY');
+    assert.deepEqual(rule.daysOfWeek, [1, 4]);
   });
 });

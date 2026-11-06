@@ -5,6 +5,7 @@ const { createUserRouter } = require('./controllers/userController');
 const { createNotificationRouter } = require('./controllers/notificationController');
 const { createTaskRouter } = require('./controllers/taskController');
 const { createCommentRouter } = require('./controllers/commentController');
+const { createRecurrenceRouter } = require('./controllers/recurrenceController');
 const { errorHandler, notFoundHandler } = require('./middleware/errorHandler');
 
 /** Builds the Express app from a container. No port is opened here, so tests can use it freely. */
@@ -16,6 +17,7 @@ function createApp(container) {
   app.use('/api/notifications', createNotificationRouter(container));
   app.use('/api/tasks', createTaskRouter(container));
   app.use('/api/comments', createCommentRouter(container));
+  app.use('/api/recurrence-rules', createRecurrenceRouter(container));
   // TODO members: mount your routers here, e.g. app.use('/api/projects', createProjectRouter(container));
 
   app.use('/api', notFoundHandler);

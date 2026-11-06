@@ -9,6 +9,8 @@ function loadConfig(env = process.env) {
     // FR5: due-soon window and how often the scheduler checks
     dueSoonWindowHours: Number(env.DUE_SOON_WINDOW_HOURS) || 24,
     dueSoonCheckIntervalMs: Number(env.DUE_SOON_CHECK_INTERVAL_MS) || 60000,
+    // FR1: how often the recurrence job generates the day's recurring tasks (safe to run repeatedly)
+    recurrenceCheckIntervalMs: Number(env.RECURRENCE_CHECK_INTERVAL_MS) || 3600000,
   };
 }
 
