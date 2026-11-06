@@ -35,8 +35,10 @@ CREATE TABLE IF NOT EXISTS tasks (
   project_id INTEGER NOT NULL REFERENCES projects(id),
   assignee_id INTEGER REFERENCES users(id),
   due_soon_notified INTEGER NOT NULL DEFAULT 0,
-  created_at TEXT NOT NULL
-  -- TODO Member A: add rule_id and occurrence_date, plus UNIQUE (rule_id, occurrence_date) (NFR1)
+    created_at TEXT NOT NULL,
+  rule_id INTEGER REFERENCES recurrence_rules(id),
+  occurrence_date TEXT,
+  UNIQUE (rule_id, occurrence_date)
 );
 
 -- FR5 (Member E)
@@ -52,6 +54,16 @@ CREATE TABLE IF NOT EXISTS notifications (
 CREATE INDEX IF NOT EXISTS idx_notifications_recipient ON notifications (recipient_id, created_at);
 
 -- TODO Member A: recurrence_rules table
+-- FR1 / NFR1 (Member A)
+CREATE TABLE IF NOT EXISTS recurrence_rules (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  template_task_id INTEGER NOT NULL REFERENCES tasks(id),
+  frequency TEXT NOT NULL CHECK (frequency IN ('DAILY', 'WEEKLY', 'MONTHLY')),
+  days_of_week TEXT,
+  day_of_month INTEGER,
+  end_date TEXT,
+  created_at TEXT NOT NULL
+);
 -- TODO Member C: status_log table (append-only, NFR3)
 -- TODO Member D: comments and mentions tables
 `;
