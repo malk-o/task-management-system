@@ -85,4 +85,16 @@ describe('RecurrenceService (unit)', () => {
     const [created] = fakes.savedTasks;
     assert.equal(created.dueDate, '2026-11-13T12:00:00.000Z');
   });
+
+  it('clockChange_doesNotSkipOrRepeatOccurrence', () => {
+    // These days cover the end of daylight saving time in Egypt in late October.
+    const days = ['2026-10-28', '2026-10-29', '2026-10-30', '2026-10-31'];
+
+    days.forEach((day) => {
+      assert.equal(service.generateDue(day), 1);
+      assert.equal(service.generateDue(day), 0); // running again must not repeat it
+    });
+
+    assert.deepEqual(fakes.savedTasks.map((t) => t.occurrenceDate), days);
+  });
 });
