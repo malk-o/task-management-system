@@ -54,7 +54,9 @@ function buildContainer({ db, clock, config }) {
   // TODO members A-D: these are empty for now; fill them in (see docs/MEMBER_TODO.md)
   const taskFactory = createTaskFactory();
   const taskService = createTaskService({ taskRepository, eventPublisher, runInTransaction });
-  const recurrenceService = createRecurrenceService({ taskRepository, taskFactory, runInTransaction });
+  const recurrenceService = createRecurrenceService({
+  recurrenceRuleRepository, taskRepository, taskFactory, runInTransaction,
+});
   const commentService = createCommentService({ eventPublisher, projectMemberRepository, runInTransaction });
 
   return {
