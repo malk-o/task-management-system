@@ -54,4 +54,35 @@ describe('RecurrenceService (unit)', () => {
     assert.equal(secondRun, 0);
     assert.equal(fakes.savedTasks.length, 1);
   });
+
+  it('afterEndDate_createsNoTask', () => {
+    fakes.rules[0].endDate = '2026-11-10';
+
+    const created = service.generateDue('2026-11-11');
+
+    assert.equal(created, 0);
+    assert.equal(fakes.savedTasks.length, 0);
+  });
+
+  it('occurrence_copiesTitleDescriptionPriorityAssignee', () => {
+    service.generateDue('2026-11-11');
+
+    const [created] = fakes.savedTasks;
+    assert.equal(created.title, 'Weekly report');
+    assert.equal(created.description, 'Send the report');
+    assert.equal(created.priority, 'HIGH');
+    assert.equal(created.assigneeId, 2);
+    assert.equal(created.status, 'TODO');
+  });
+
+  it('dueDate_keepsSameOffset', () => {
+    // Template was created on Nov 8 and is due on Nov 10: an offset of 2 days.
+    fakes.template.createdAt = '2026-11-08T09:00:00.000Z';
+    fakes.template.dueDate = '2026-11-10T12:00:00.000Z';
+
+    service.generateDue('2026-11-11');
+
+    const [created] = fakes.savedTasks;
+    assert.equal(created.dueDate, '2026-11-13T12:00:00.000Z');
+  });
 });
