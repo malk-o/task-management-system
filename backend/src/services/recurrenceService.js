@@ -78,6 +78,14 @@ function createRecurrenceService({
         .map((rule) => generateOccurrence(rule, date))
         .length);
     },
+
+    createRule({
+      templateTaskId, frequency, daysOfWeek = null, dayOfMonth = null, endDate = null,
+    }) {
+      return recurrenceRuleRepository.save({
+        templateTaskId, frequency, daysOfWeek, dayOfMonth, endDate,
+      });
+    },
   };
 }
 
