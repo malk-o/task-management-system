@@ -15,6 +15,28 @@ function dayBefore(date) {
   return new Date(Date.UTC(year, month - 1, day - 1)).toISOString().slice(0, 10);
 }
 
+function toUtcMs(date) {
+  const [year, month, day] = date.split('-').map(Number);
+  return Date.UTC(year, month - 1, day);
+}
+
+function addDays(date, days) {
+  const [year, month, day] = date.split('-').map(Number);
+  return new Date(Date.UTC(year, month - 1, day + days)).toISOString().slice(0, 10);
+}
+
+/**
+ * The new due date keeps the template's offset (whole days between its creation and its due date)
+ * and its time of day, counted from the occurrence date.
+ */
+function dueDateFor(template, occurrenceDate) {
+  if (!template.dueDate) return null;
+  const createdOn = (template.createdAt ?? template.dueDate).slice(0, 10);
+  const dueOn = template.dueDate.slice(0, 10);
+  const offsetDays = Math.round((toUtcMs(dueOn) - toUtcMs(createdOn)) / 86400000);
+  return addDays(occurrenceDate, offsetDays) + template.dueDate.slice(10);
+}
+
 /**
  * FR1 / NFR1 (Member A): creates the occurrences that fall on a given date,
  * exactly once per (rule, date).
@@ -39,6 +61,7 @@ function createRecurrenceService({
       description: template.description,
       priority: template.priority,
       assigneeId: template.assigneeId,
+      dueDate: dueDateFor(template, date),
       ruleId: rule.id,
       occurrenceDate: date,
     });
