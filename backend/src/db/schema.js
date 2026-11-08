@@ -64,7 +64,23 @@ CREATE TABLE IF NOT EXISTS recurrence_rules (
   end_date TEXT,
   created_at TEXT NOT NULL
 );
--- TODO Member C: status_log table (append-only, NFR3)
+
+-- FR3 / NFR3 (Member C): append-only status log. The triggers make the database itself refuse
+-- any UPDATE or DELETE, so a log entry can never be edited or removed.
+CREATE TABLE IF NOT EXISTS status_log (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  task_id INTEGER NOT NULL REFERENCES tasks(id),
+  old_status TEXT NOT NULL,
+  new_status TEXT NOT NULL,
+  changed_by INTEGER NOT NULL REFERENCES users(id),
+  changed_at TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_status_log_task ON status_log (task_id, id);
+CREATE TRIGGER IF NOT EXISTS status_log_no_update BEFORE UPDATE ON status_log
+BEGIN SELECT RAISE(ABORT, 'status_log is append-only'); END;
+CREATE TRIGGER IF NOT EXISTS status_log_no_delete BEFORE DELETE ON status_log
+BEGIN SELECT RAISE(ABORT, 'status_log is append-only'); END;
+
 -- TODO Member D: comments and mentions tables
 `;
 

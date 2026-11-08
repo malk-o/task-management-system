@@ -16,6 +16,9 @@ const { createTaskFactory } = require('./factories/taskFactory');
 const { createTaskService } = require('./services/taskService');
 const { createRecurrenceService } = require('./services/recurrenceService');
 const { createCommentService } = require('./services/commentService');
+const { createStatusLogRepository } = require('./repositories/statusLogRepository');
+const { createStatusService } = require('./services/statusService');
+const { createReportService } = require('./services/reportService');
 
 /**
  * Composition root: the ONE place where objects are created and connected.
@@ -32,6 +35,7 @@ function buildContainer({ db, clock, config }) {
   const taskRepository = createTaskRepository(db);
   const notificationRepository = createNotificationRepository(db);
   const recurrenceRuleRepository = createRecurrenceRuleRepository(db);
+  const statusLogRepository = createStatusLogRepository(db); // Member C
 
   // Observer: publisher + listeners
   const eventPublisher = new SynchronousEventPublisher();
@@ -58,8 +62,12 @@ function buildContainer({ db, clock, config }) {
   recurrenceRuleRepository, taskRepository, taskFactory, runInTransaction,
 });
   const commentService = createCommentService({ eventPublisher, projectMemberRepository, runInTransaction });
-
-  return {
+  // Member C (FR3, NFR3): status workflow
+  const statusService = createStatusService({
+    taskRepository, statusLogRepository, eventPublisher, accessControlService, runInTransaction, clock,});
+  const reportService = createReportService({
+    taskRepository, userRepository, projectRepository, accessControlService, clock,});
+    return {
     db,
     clock,
     config,
@@ -70,6 +78,7 @@ function buildContainer({ db, clock, config }) {
     taskRepository,
     notificationRepository,
     recurrenceRuleRepository,
+    statusLogRepository,
     eventPublisher,
     accessControlService,
     notificationService,
@@ -78,6 +87,8 @@ function buildContainer({ db, clock, config }) {
     taskService,
     recurrenceService,
     commentService,
+    statusService,
+    reportService,
   };
 }
 
