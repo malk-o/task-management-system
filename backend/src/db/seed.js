@@ -26,6 +26,14 @@ function seedDemoData({ userRepository, projectRepository, projectMemberReposito
   task(sara, 'Prepare sprint demo', inHours(23), Priority.HIGH);
   task(omar, 'Write test plan', inHours(24 * 5), Priority.MEDIUM);
   task(layla, 'Review architecture diagram', inHours(24 * 2), Priority.LOW);
+  
+  // Member C: extra demo data so the report is not empty (done, in review, overdue)
+  const withStatus = (assignee, title, dueDate, priority, status) =>
+    taskRepository.save({ projectId: project.id, assigneeId: assignee.id, title, dueDate, priority, status });
+  withStatus(sara, 'Set up repository', inHours(-24 * 6), Priority.HIGH, 'DONE');
+  withStatus(omar, 'Draft requirements', inHours(-24 * 4), Priority.MEDIUM, 'DONE');
+  withStatus(layla, 'Design database schema', inHours(24 * 3), Priority.MEDIUM, 'IN_REVIEW');
+  withStatus(omar, 'Fix login bug', inHours(-24 * 2), Priority.HIGH, 'IN_PROGRESS');
 }
 
 module.exports = { seedDemoData };

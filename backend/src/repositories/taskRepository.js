@@ -80,6 +80,9 @@ function createTaskRepository(db) {
     findAll() {
       return db.prepare('SELECT * FROM tasks ORDER BY id').all().map(toTask);
     },
+    findByProjectId(projectId) {
+      return db.prepare('SELECT * FROM tasks WHERE project_id = ? ORDER BY id').all(projectId).map(toTask);
+    },
     findByRuleAndOccurrenceDate(ruleId, occurrenceDate) {
       return toTask(db.prepare(
         'SELECT * FROM tasks WHERE rule_id = ? AND occurrence_date = ?',
