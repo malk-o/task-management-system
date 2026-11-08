@@ -4,6 +4,7 @@ const express = require('express');
 const { createUserRouter } = require('./controllers/userController');
 const { createNotificationRouter } = require('./controllers/notificationController');
 const { createTaskRouter } = require('./controllers/taskController');
+const { createProjectRouter } = require('./controllers/projectController');
 const { createCommentRouter } = require('./controllers/commentController');
 const { createRecurrenceRouter } = require('./controllers/recurrenceController');
 const { createStatusRouter } = require('./controllers/statusController');
@@ -17,6 +18,7 @@ function createApp(container) {
 
   app.use('/api/users', createUserRouter(container));
   app.use('/api/notifications', createNotificationRouter(container));
+  app.use('/api/projects', createProjectRouter(container));
   app.use('/api/tasks', createTaskRouter(container));
   app.use('/api/tasks', createStatusRouter(container));
   app.use('/api/reports', createReportRouter(container));

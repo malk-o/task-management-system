@@ -11,6 +11,10 @@ function createProjectMemberRepository(db) {
         .run(member.projectId, member.userId, member.role);
       return { ...member, id: Number(result.lastInsertRowid) };
     },
+    findByProjectId(projectId) {
+      return db.prepare('SELECT * FROM project_members WHERE project_id = ? ORDER BY id')
+        .all(projectId).map(toMember);
+    },    
     findByProjectIdAndRole(projectId, role) {
       return db.prepare('SELECT * FROM project_members WHERE project_id = ? AND role = ? ORDER BY id')
         .all(projectId, role).map(toMember);
