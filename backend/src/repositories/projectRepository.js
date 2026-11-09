@@ -15,6 +15,14 @@ function createProjectRepository(db) {
     findAll() {
       return db.prepare('SELECT * FROM projects ORDER BY id').all().map(toProject);
     },
+        /** FR2: the projects a user belongs to. */
+    findByMemberUserId(userId) {
+      return db.prepare(
+        `SELECT p.* FROM projects p
+         JOIN project_members m ON m.project_id = p.id
+         WHERE m.user_id = ? ORDER BY p.id`,
+      ).all(userId).map(toProject);
+    },
   };
 }
 

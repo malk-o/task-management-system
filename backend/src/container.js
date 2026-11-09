@@ -14,6 +14,7 @@ const { createDueSoonService } = require('./services/dueSoonService');
 const { createAccessControlService } = require('./security/accessControlService');
 const { createTaskFactory } = require('./factories/taskFactory');
 const { createTaskService } = require('./services/taskService');
+const { createProjectService } = require('./services/projectService');
 const { createRecurrenceService } = require('./services/recurrenceService');
 const { createCommentService } = require('./services/commentService');
 const { createStatusLogRepository } = require('./repositories/statusLogRepository');
@@ -57,7 +58,14 @@ function buildContainer({ db, clock, config }) {
 
   // TODO members A-D: these are empty for now; fill them in (see docs/MEMBER_TODO.md)
   const taskFactory = createTaskFactory();
-  const taskService = createTaskService({ taskRepository, eventPublisher, runInTransaction });
+  // Member B (FR2, NFR2): projects, task creation and assignment
+  const projectService = createProjectService({
+    projectRepository, projectMemberRepository, userRepository, accessControlService, runInTransaction,
+  });
+  const taskService = createTaskService({
+    taskRepository, projectRepository, projectMemberRepository, taskFactory,
+    accessControlService, eventPublisher, runInTransaction,
+  });
   const recurrenceService = createRecurrenceService({
   recurrenceRuleRepository, taskRepository, taskFactory, runInTransaction,
 });
@@ -84,6 +92,7 @@ function buildContainer({ db, clock, config }) {
     notificationService,
     dueSoonService,
     taskFactory,
+    projectService,    
     taskService,
     recurrenceService,
     commentService,

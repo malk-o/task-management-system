@@ -9,11 +9,11 @@
 - [ ] Paradigms evidence (declarative vs imperative) for the document
 
 ## Member B - FR2 Task Creation and Assignment, NFR2 Usability (Factory, Repository)
-- [ ] `factories/taskFactory.js` (default status TODO) and `taskService.createTask / assignTask`
-- [ ] Publish `events.taskAssigned(...)` after assigning
-- [ ] Project controller (create project, add members) and `controllers/taskController.js` (create, assign)
-- [ ] `frontend/src/pages/ProjectsPage.jsx`: create and assign in 3 steps or fewer
-- [ ] Extend the seed data if needed; keep the README run section correct
+- [x] `factories/taskFactory.js` (default status TODO) and `taskService.createTask / assignTask`
+- [x] Publish `events.taskAssigned(...)` after assigning
+- [x] Project controller (create project, add members) and `controllers/taskController.js` (create, assign)
+- [x] `frontend/src/pages/ProjectsPage.jsx`: create and assign in 3 steps or fewer
+- [x] Extend the seed data if needed; keep the README run section correct
 
 ## Member C - FR3 Status Workflow and Reports, NFR3 Auditability (State)
 - [ ] `states/` one object per status with allowed transitions
