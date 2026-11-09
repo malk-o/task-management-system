@@ -4,14 +4,15 @@ const { Priority, Role } = require('../domain/enums');
 
 /**
  * Demo data so the beta can be shown without sign-up.
- * Users: 1 = Mona (manager), 2 = Sara, 3 = Omar, 4 = Layla (members).
+ * Users: 1 = Mona (manager), 2 = Sara, 3 = Omar, 4 = Layla (members), 5 = Nour (in no project yet).
  */
 function seedDemoData({ userRepository, projectRepository, projectMemberRepository, taskRepository, clock }) {
   const mona = userRepository.save({ name: 'Mona Manager', email: 'mona@example.com' });
   const sara = userRepository.save({ name: 'Sara Member', email: 'sara@example.com' });
   const omar = userRepository.save({ name: 'Omar Member', email: 'omar@example.com' });
   const layla = userRepository.save({ name: 'Layla Member', email: 'layla@example.com' });
-
+  // Member B: a user who is in no project yet, so "add a member" can be shown in the demo
+  userRepository.save({ name: 'Nour Member', email: 'nour@example.com' });
   const project = projectRepository.save({ name: 'GIU Demo Project' });
 
   projectMemberRepository.save({ projectId: project.id, userId: mona.id, role: Role.MANAGER });

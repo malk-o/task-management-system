@@ -36,7 +36,7 @@ cd frontend
 npm install
 npm run dev
 ```
-The beta uses an in-memory SQLite database seeded with demo data (`backend/src/db/seed.js`): a manager (user 1, Mona) and three members (users 2 to 4). Pick the user from the dropdown in the top bar. A task due in 23 hours is seeded, so a due-soon notification for Sara appears as soon as the backend starts.
+The beta uses an in-memory SQLite database seeded with demo data (`backend/src/db/seed.js`): a manager (user 1, Mona), three members (users 2 to 4) and Nour (user 5), who is in no project yet so that "add a member" can be shown. Pick the user from the dropdown in the top bar. A task due in 23 hours is seeded, so a due-soon notification for Sara appears as soon as the backend starts.
 
 Data resets every time the backend restarts. To keep data, start it with `DB_PATH=tasks.db`.
 

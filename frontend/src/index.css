@@ -270,3 +270,15 @@ button:focus-visible, select:focus-visible {
 .report-number { font-size: 2rem; font-weight: 600; color: var(--brand); }
 .report-table { border-collapse: collapse; width: 100%; background: var(--surface); border: 1px solid var(--line); }
 .report-table th, .report-table td { text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--line); }
+
+/* FR2 (Member B): projects and task creation */
+.inline-form { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin: 12px 0 20px; }
+.inline-form input, .inline-form select, .task-form input, .task-form select { padding: 8px; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); }
+.inline-form button, .task-form button { padding: 8px 16px; border: 1px solid var(--brand); border-radius: 6px; background: var(--brand); color: #fff; cursor: pointer; }
+.inline-form button:disabled { opacity: 0.5; cursor: default; }
+.task-form { display: flex; flex-direction: column; gap: 10px; max-width: 480px; margin: 16px 0 24px; }
+.task-form label { display: flex; flex-direction: column; gap: 4px; }
+.task-form button { align-self: flex-start; }
+.step { display: inline-block; font-size: 0.75rem; font-weight: 600; padding: 1px 8px; border-radius: 999px; background: #e4edff; color: #1d4fd8; margin-right: 6px; }
+.task-form button .step { background: rgba(255, 255, 255, 0.25); color: #fff; }
+.task-form .step { align-self: flex-start; }
