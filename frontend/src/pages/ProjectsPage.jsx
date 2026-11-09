@@ -60,6 +60,11 @@ export default function ProjectsPage({ userId }) {
       .catch((e) => setError(e.message));
   }, [userId, loadProjects, loadProject]);
 
+  useEffect(() => {
+    setAssigneeId('');
+    setMemberToAdd('');
+  }, [projectId, userId]);
+
   async function run(action, successMessage) {
     setError('');
     setMessage('');
