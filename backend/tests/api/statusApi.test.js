@@ -107,9 +107,9 @@ describe('Status API', () => {
     assert.deepEqual(body.allowedTransitions, ['IN_PROGRESS']);
   });
 
-  it('GET /tasks without the X-User-Id header returns 400', async () => {
+  it('GET /tasks without signing in returns 401', async () => {
     const response = await call('/tasks', null);
 
-    assert.equal(response.status, 400);
+    assert.equal(response.status, 401);
   });
 });

@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 import { api } from './api.js';
+import { useAuth } from './auth/AuthContext.jsx';
+import AccountMenu from './components/AccountMenu.jsx';
 import { initials } from './time.js';
 import {
   BrandMark, IconBell, IconChart, IconClipboard, IconFile, IconRepeat,
@@ -20,21 +22,11 @@ const NAV = [
 ];
 
 export default function App() {
-  const [users, setUsers] = useState([]);
-  const [userId, setUserId] = useState(null);
+  const { user: currentUser, signOut } = useAuth();
+  const userId = currentUser.id;
   const [tab, setTab] = useState('notifications');
   const [unread, setUnread] = useState(0);
   const [error, setError] = useState('');
-
-  // Load the seeded users for the "signed in as" picker.
-  useEffect(() => {
-    api('/users')
-      .then((list) => {
-        setUsers(list);
-        if (list.length > 0) setUserId(list[0].id);
-      })
-      .catch((e) => setError(`Cannot reach the backend: ${e.message}. Is "npm start" running in the backend folder?`));
-  }, []);
 
   // Poll the unread count so the badge updates without a page refresh.
   useEffect(() => {
@@ -55,8 +47,6 @@ export default function App() {
     reports: <ReportsPage userId={userId} />,
     notifications: <NotificationsPage userId={userId} onChange={setUnread} />,
   }[tab];
-
-  const currentUser = users.find((u) => u.id === userId);
 
   return (
     <div className="shell">
@@ -83,19 +73,7 @@ export default function App() {
           ))}
         </nav>
 
-        <div className="account">
-          <div className="account-row">
-            <span className="avatar" aria-hidden="true">{initials(currentUser?.name)}</span>
-            <label>
-              <span className="account-label">Signed in as</span>
-              <select value={userId ?? ''} onChange={(e) => setUserId(Number(e.target.value))}>
-                {users.map((u) => (
-                  <option key={u.id} value={u.id}>{u.name}</option>
-                ))}
-              </select>
-            </label>
-          </div>
-        </div>
+        <AccountMenu user={currentUser} onSignOut={signOut} />
       </aside>
 
       <main className="content">

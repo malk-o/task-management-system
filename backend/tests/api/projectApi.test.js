@@ -167,9 +167,9 @@ describe('Project and task API', () => {
     assert.deepEqual(body.map((t) => t.title), ['One', 'Two']);
   });
 
-  it('requests without the X-User-Id header return 400', async () => {
-    assert.equal((await call('/projects', null)).status, 400);
-    assert.equal((await call('/tasks', null, 'POST', { projectId: 1, title: 'X' })).status, 400);
+  it('requests without signing in return 401', async () => {
+    assert.equal((await call('/projects', null)).status, 401);
+    assert.equal((await call('/tasks', null, 'POST', { projectId: 1, title: 'X' })).status, 401);
   });
 
   it('the status routes of Member C still work next to the task router', async () => {

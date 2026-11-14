@@ -1,5 +1,7 @@
 'use strict';
 
+const { createAuth } = require('./auth');
+
 const express = require('express');
 const { createUserRouter } = require('./controllers/userController');
 const { createNotificationRouter } = require('./controllers/notificationController');
@@ -15,6 +17,12 @@ const { errorHandler, notFoundHandler } = require('./middleware/errorHandler');
 function createApp(container) {
   const app = express();
   app.use(express.json());
+
+  // Login module (docs/AUTH.md): everything under /api needs a signed-in user except /api/auth/login and /register.
+  const auth = createAuth(container);
+  app.use('/api', auth.authenticate);
+  app.use('/api/auth', auth.router);
+  app.use('/api', auth.requireAuthenticated);
 
   app.use('/api/users', createUserRouter(container));
   app.use('/api/notifications', createNotificationRouter(container));

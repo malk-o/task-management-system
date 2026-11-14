@@ -1,18 +1,16 @@
 'use strict';
 
-const { InvalidRequestError } = require('../errors/errors');
+const { UnauthorizedError } = require('../auth/authErrors');
 
 /**
- * Beta authentication: the frontend sends the current user in the X-User-Id header.
- * Member D can replace this with real login later; controllers only read req.userId.
+ * Kept under the same name so every router that does `router.use(requireUserId)` keeps working.
+ * The user is now identified by a verified login session (see docs/AUTH.md), not by a header the
+ * client could fake. req.userId is set by the authentication middleware in src/auth/.
  */
 function requireUserId(req, res, next) {
-  const raw = req.header('X-User-Id');
-  const id = Number(raw);
-  if (!raw || !Number.isInteger(id) || id <= 0) {
-    return next(new InvalidRequestError('Missing or invalid X-User-Id header'));
+  if (!req.userId) {
+    return next(new UnauthorizedError('Please sign in to continue.'));
   }
-  req.userId = id;
   return next();
 }
 

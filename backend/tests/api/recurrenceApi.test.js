@@ -82,12 +82,12 @@ describe('Recurrence API', () => {
     assert.equal(response.status, 400);
   });
 
-  it('POST /recurrence-rules without the X-User-Id header returns 400', async () => {
+  it('POST /recurrence-rules without signing in returns 401', async () => {
     const response = await call('/recurrence-rules', null, {
       method: 'POST',
       body: { templateTaskId: template.id, frequency: 'DAILY' },
     });
 
-    assert.equal(response.status, 400);
+    assert.equal(response.status, 401);
   });
 });
