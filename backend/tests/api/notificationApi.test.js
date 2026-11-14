@@ -103,14 +103,14 @@ describe('Notification API', () => {
     assert.equal(response.status, 400);
   });
 
-  it('GET /notifications without the X-User-Id header returns 400', async () => {
+  it('GET /notifications without signing in returns 401', async () => {
     const response = await call('/notifications', null);
 
-    assert.equal(response.status, 400);
+    assert.equal(response.status, 401);
   });
 
   it('GET /users lists users for the login picker', async () => {
-    const body = await (await call('/users', null)).json();
+    const body = await (await call('/users', sara.id)).json();
 
     assert.deepEqual(body.map((u) => u.name).sort(), ['Mona', 'Sara']);
   });

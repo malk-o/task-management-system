@@ -4,10 +4,12 @@ import '@fontsource/ibm-plex-sans/400.css';
 import '@fontsource/ibm-plex-sans/500.css';
 import '@fontsource/ibm-plex-sans/600.css';
 import App from './App.jsx';
+import { AuthProvider } from './auth/AuthContext.jsx';
+import AuthGate from './auth/AuthGate.jsx';
 import './index.css';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <App />
+    <AuthProvider><AuthGate><App /></AuthGate></AuthProvider>
   </React.StrictMode>
 );

@@ -61,9 +61,9 @@ describe('Report API', () => {
     assert.equal(response.status, 400);
   });
 
-  it('GET /reports/:projectId without X-User-Id returns 400', async () => {
+  it('GET /reports/:projectId without signing in returns 401', async () => {
     const response = await call(`/reports/${project.id}`, null);
 
-    assert.equal(response.status, 400);
+    assert.equal(response.status, 401);
   });
 });

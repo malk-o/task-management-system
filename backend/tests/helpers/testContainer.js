@@ -16,7 +16,7 @@ function createFakeClock(start = '2026-11-10T10:00:00.000Z') {
 function buildTestContainer({ start } = {}) {
   const db = createDatabase(':memory:');
   const clock = createFakeClock(start);
-  return buildContainer({ db, clock, config: { dueSoonWindowHours: 24 } });
+  return buildContainer({ db, clock, config: { dueSoonWindowHours: 24, trustUserIdHeader: true } });
 }
 
 /** Small helpers that save users, projects, members and tasks in one line. */
