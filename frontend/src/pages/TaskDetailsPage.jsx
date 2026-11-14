@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 import { api } from '../api.js';
 import StatusPanel, { label } from '../components/StatusPanel.jsx';
+import CommentsSection from '../components/CommentsSection.jsx';
 
-// Members C and D. Member C: the status panel (FR3, NFR3).
-// TODO Member D (FR4): render <CommentsSection taskId={task.id} currentUserId={userId} /> below the status panel.
+// Members C and D. Member C: the status panel (FR3, NFR3). Member D: the comments (FR4, NFR4).
 export default function TaskDetailsPage({ userId }) {
   const [tasks, setTasks] = useState([]);
   const [users, setUsers] = useState([]);
@@ -47,6 +47,8 @@ export default function TaskDetailsPage({ userId }) {
       {task && (
         <StatusPanel task={task} userId={userId} users={users} onChanged={replaceTask} />
       )}
+
+      {task && <CommentsSection taskId={task.id} userId={userId} />}
     </section>
   );
 }

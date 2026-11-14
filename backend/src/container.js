@@ -17,6 +17,7 @@ const { createTaskService } = require('./services/taskService');
 const { createProjectService } = require('./services/projectService');
 const { createRecurrenceService } = require('./services/recurrenceService');
 const { createCommentService } = require('./services/commentService');
+const { createCommentRepository } = require('./repositories/commentRepository');
 const { createStatusLogRepository } = require('./repositories/statusLogRepository');
 const { createStatusService } = require('./services/statusService');
 const { createReportService } = require('./services/reportService');
@@ -37,6 +38,7 @@ function buildContainer({ db, clock, config }) {
   const notificationRepository = createNotificationRepository(db);
   const recurrenceRuleRepository = createRecurrenceRuleRepository(db);
   const statusLogRepository = createStatusLogRepository(db); // Member C
+  const commentRepository = createCommentRepository(db); // Member D
 
   // Observer: publisher + listeners
   const eventPublisher = new SynchronousEventPublisher();
@@ -69,7 +71,11 @@ function buildContainer({ db, clock, config }) {
   const recurrenceService = createRecurrenceService({
   recurrenceRuleRepository, taskRepository, taskFactory, runInTransaction,
 });
-  const commentService = createCommentService({ eventPublisher, projectMemberRepository, runInTransaction });
+  // Member D (FR4, NFR4): comments and mentions
+  const commentService = createCommentService({
+    commentRepository, taskRepository, userRepository, projectMemberRepository,
+    accessControlService, eventPublisher, runInTransaction, clock,
+  });
   // Member C (FR3, NFR3): status workflow
   const statusService = createStatusService({
     taskRepository, statusLogRepository, eventPublisher, accessControlService, runInTransaction, clock,});
@@ -87,6 +93,7 @@ function buildContainer({ db, clock, config }) {
     notificationRepository,
     recurrenceRuleRepository,
     statusLogRepository,
+    commentRepository,
     eventPublisher,
     accessControlService,
     notificationService,

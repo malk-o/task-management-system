@@ -12,11 +12,10 @@ function createReportService({ taskRepository, userRepository, projectRepository
   const isOpen = (task) => !isDone(task);
 
   function getProjectReport(projectId, userId) {
-    accessControlService.requireManager(userId, projectId); // NFR4: managers only, checked first
-
     if (projectRepository && !projectRepository.findById(projectId)) {
       throw new NotFoundError(`Project ${projectId} not found`);
     }
+    accessControlService.requireManager(userId, projectId); // NFR4: managers only
 
     const tasks = taskRepository.findByProjectId(projectId);
     const now = clock.now().toISOString(); // ISO UTC text sorts like time, so strings compare correctly
