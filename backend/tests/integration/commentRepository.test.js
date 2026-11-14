@@ -1,72 +1,61 @@
-const { describe, test, beforeEach } = require('node:test');
+'use strict';
+
+const { describe, it, beforeEach } = require('node:test');
 const assert = require('node:assert/strict');
-const { DatabaseSync } = require('node:sqlite');
+const { createDatabase, createTransactionRunner } = require('../../src/db/database');
 const { createCommentRepository } = require('../../src/repositories/commentRepository');
 
-// Real in-memory SQLite database.
-// If db/schema.js already exports a function that creates every table, call that here instead
-// (the same way the other integration tests do) and remove the CREATE TABLE lines below.
-function setupDb() {
-  const db = new DatabaseSync(':memory:');
-  db.exec(`
-    CREATE TABLE users (id INTEGER PRIMARY KEY, name TEXT NOT NULL);
-    CREATE TABLE tasks (id INTEGER PRIMARY KEY, title TEXT NOT NULL);
-    CREATE TABLE comments (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      task_id INTEGER NOT NULL REFERENCES tasks(id),
-      author_id INTEGER NOT NULL REFERENCES users(id),
-      body TEXT NOT NULL CHECK (length(trim(body)) > 0),
-      created_at TEXT NOT NULL
-    );
-    CREATE TABLE mentions (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      comment_id INTEGER NOT NULL REFERENCES comments(id),
-      mentioned_user_id INTEGER NOT NULL REFERENCES users(id),
-      UNIQUE (comment_id, mentioned_user_id)
-    );
-    INSERT INTO users (id, name) VALUES (1, 'Mona Manager'), (2, 'Sara Member'), (3, 'Omar Member');
-    INSERT INTO tasks (id, title) VALUES (10, 'Prepare sprint demo'), (11, 'Write report');
-  `);
-  return db;
-}
-
+/** FR4 (Member D): the comment repository on a real in-memory SQLite database with the real schema. */
 describe('CommentRepository (integration)', () => {
   let db;
   let repo;
+  let runInTransaction;
+
   beforeEach(() => {
-    db = setupDb();
+    db = createDatabase(':memory:');
+    runInTransaction = createTransactionRunner(db);
     repo = createCommentRepository(db);
+    db.exec(`
+      INSERT INTO users (id, name) VALUES (1, 'Mona Manager'), (2, 'Sara Member'), (3, 'Omar Member');
+      INSERT INTO projects (id, name) VALUES (1, 'Demo');
+      INSERT INTO tasks (id, title, project_id, created_at) VALUES
+        (10, 'Prepare sprint demo', 1, '2026-11-10T09:00:00.000Z'),
+        (11, 'Write report', 1, '2026-11-10T09:00:00.000Z');
+    `);
   });
 
-  test('findByTask_returnsCommentsOldestFirst', () => {
+  const save = (taskId, authorId, body, createdAt, mentionedUserIds = []) =>
+    runInTransaction(() => repo.saveWithMentions({ taskId, authorId, body, createdAt }, mentionedUserIds));
+
+  it('findByTask_returnsCommentsOldestFirst', () => {
     // saved out of order on purpose
-    repo.saveWithMentions({ taskId: 10, authorId: 1, body: 'second', createdAt: '2026-11-07T10:05:00.000Z' }, []);
-    repo.saveWithMentions({ taskId: 10, authorId: 2, body: 'first', createdAt: '2026-11-07T10:00:00.000Z' }, []);
-    repo.saveWithMentions({ taskId: 10, authorId: 3, body: 'third', createdAt: '2026-11-07T10:09:00.000Z' }, []);
+    save(10, 1, 'second', '2026-11-10T10:05:00.000Z');
+    save(10, 2, 'first', '2026-11-10T10:00:00.000Z');
+    save(10, 3, 'third', '2026-11-10T10:09:00.000Z');
 
     assert.deepEqual(repo.findByTask(10).map((c) => c.body), ['first', 'second', 'third']);
   });
 
-  test('findByTask_onlyReturnsThatTasksComments', () => {
-    repo.saveWithMentions({ taskId: 10, authorId: 1, body: 'on task 10', createdAt: '2026-11-07T10:00:00.000Z' }, []);
-    repo.saveWithMentions({ taskId: 11, authorId: 1, body: 'on task 11', createdAt: '2026-11-07T10:00:00.000Z' }, []);
+  it('findByTask_onlyReturnsThatTasksComments', () => {
+    save(10, 1, 'on task 10', '2026-11-10T10:00:00.000Z');
+    save(11, 1, 'on task 11', '2026-11-10T10:00:00.000Z');
 
     assert.deepEqual(repo.findByTask(11).map((c) => c.body), ['on task 11']);
   });
 
-  test('saveWithMentions_storesMentionRows', () => {
-    const comment = repo.saveWithMentions(
-      { taskId: 10, authorId: 1, body: '@Sara @Omar look', createdAt: '2026-11-07T10:00:00.000Z' }, [2, 3]
-    );
+  it('saveWithMentions_storesMentionRows', () => {
+    const comment = save(10, 1, '@Sara @Omar look', '2026-11-10T10:00:00.000Z', [2, 3]);
     assert.deepEqual(repo.findMentionedUserIds(comment.id), [2, 3]);
   });
 
-  test('failedMention_rollsBackTheWholeComment', () => {
+  it('failedMention_rollsBackTheWholeComment', () => {
     // the same user twice breaks UNIQUE(comment_id, mentioned_user_id)
-    assert.throws(() =>
-      repo.saveWithMentions({ taskId: 10, authorId: 1, body: 'oops', createdAt: '2026-11-07T10:00:00.000Z' }, [2, 2])
-    );
+    assert.throws(() => save(10, 1, 'oops', '2026-11-10T10:00:00.000Z', [2, 2]));
     assert.equal(repo.findByTask(10).length, 0);
     assert.equal(db.prepare('SELECT COUNT(*) AS n FROM mentions').get().n, 0);
+  });
+
+  it('emptyBody_isRefusedByTheDatabase', () => {
+    assert.throws(() => save(10, 1, '   ', '2026-11-10T10:00:00.000Z'));
   });
 });
