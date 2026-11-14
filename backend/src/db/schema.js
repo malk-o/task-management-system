@@ -81,7 +81,22 @@ BEGIN SELECT RAISE(ABORT, 'status_log is append-only'); END;
 CREATE TRIGGER IF NOT EXISTS status_log_no_delete BEFORE DELETE ON status_log
 BEGIN SELECT RAISE(ABORT, 'status_log is append-only'); END;
 
--- TODO Member D: comments and mentions tables
+-- FR4 (Member D): comments on tasks and the members mentioned in them
+CREATE TABLE IF NOT EXISTS comments (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  task_id INTEGER NOT NULL REFERENCES tasks(id),
+  author_id INTEGER NOT NULL REFERENCES users(id),
+  body TEXT NOT NULL CHECK (length(trim(body)) > 0),
+  created_at TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_comments_task ON comments (task_id, created_at);
+
+CREATE TABLE IF NOT EXISTS mentions (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  comment_id INTEGER NOT NULL REFERENCES comments(id),
+  mentioned_user_id INTEGER NOT NULL REFERENCES users(id),
+  UNIQUE (comment_id, mentioned_user_id)
+);
 `;
 
 module.exports = { SCHEMA };

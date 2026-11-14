@@ -24,12 +24,12 @@
 - [ ] Architecture alignment section of the document
 
 ## Member D - FR4 Comments and Mentions, NFR4 Security
-- [ ] `comments` table + repository, `commentService`, `commentController`
-- [ ] Detect valid @mentions of project members; publish `events.mentionCreated(...)` once per mentioned user
-- [ ] Make `security/accessControlService.js` real (member of project? manager?) and throw `ForbiddenError`
-- [ ] Call it from controllers (tell the others)
-- [ ] Comments UI on `TaskDetailsPage.jsx`
-- [ ] SOLID evidence section of the document
+- [x] `comments` table + repository, `commentService`, `commentController`
+- [x] Detect valid @mentions of project members; publish `events.mentionCreated(...)` once per mentioned user
+- [x] Make `security/accessControlService.js` real (member of project? manager?) and throw `ForbiddenError`
+- [x] Call it from controllers (tell the others): the services of B and C already call it; reportService now checks the project exists before the manager check, so an unknown project still returns 404
+- [x] Comments UI on `TaskDetailsPage.jsx`
+- [x] SOLID evidence section of the document
 
 ## Member E - done in the base
 FR5 Notifications and NFR5 are implemented with tests (`notificationService`, `dueSoonService`, `dueSoonCheckJob`, `notificationController`, `NotificationsPage.jsx`). Remaining: integration, demo script, submission.

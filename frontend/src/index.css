@@ -282,3 +282,23 @@ button:focus-visible, select:focus-visible {
 .step { display: inline-block; font-size: 0.75rem; font-weight: 600; padding: 1px 8px; border-radius: 999px; background: #e4edff; color: #1d4fd8; margin-right: 6px; }
 .task-form button .step { background: rgba(255, 255, 255, 0.25); color: #fff; }
 .task-form .step { align-self: flex-start; }
+/* FR4 / NFR4 (Member D): comments and mentions on the task details page */
+.comments-panel { margin-top: 16px; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 16px 20px; }
+.comments-panel h3 { margin: 0 0 12px; font-size: 1.05rem; font-weight: 600; }
+.comment-list { list-style: none; margin: 0 0 8px; padding: 0; }
+.comment { display: flex; gap: 12px; padding: 12px 0; }
+.comment + .comment { border-top: 1px solid var(--line); }
+.comment-avatar { width: 32px; height: 32px; font-size: 0.75rem; }
+.comment-body { flex: 1; min-width: 0; }
+.comment-meta { margin: 0; font-size: 0.9rem; }
+.comment-meta .muted { margin-left: 4px; font-size: 0.85rem; }
+.comment-text { margin: 2px 0 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+.mention { padding: 0 3px; border-radius: 4px; background: #eee8ff; color: #5b34c9; font-weight: 500; }
+.comment-form { display: flex; flex-direction: column; gap: 6px; margin-top: 8px; padding-top: 12px; border-top: 1px solid var(--line); }
+.comment-form label { font-size: 0.9rem; font-weight: 500; }
+.comment-form textarea { font: inherit; padding: 8px 10px; border: 1px solid var(--line); border-radius: 6px; resize: vertical; }
+.comment-form textarea:focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; }
+.comment-form .error { margin: 0; }
+.comment-form button { align-self: flex-start; padding: 8px 16px; border: 1px solid var(--brand); border-radius: 6px; background: var(--brand); color: #fff; cursor: pointer; }
+.comment-form button:disabled { opacity: 0.5; cursor: default; }
+.access-denied { margin: 0; padding: 10px 14px; border-radius: 6px; background: #fde7e4; color: #b42318; }
