@@ -1,9 +1,9 @@
-# Shared contracts
+﻿# Shared contracts
 
 Everyone codes against these. If you must change one, tell the team first.
 
 ## Beta authentication
-No sign-up for the beta. The frontend sends the current user in the header `X-User-Id`; the seeded users are 1 = Mona (manager), 2 = Sara, 3 = Omar, 4 = Layla. In a router add `router.use(requireUserId)` (from `middleware/currentUser.js`) and read `req.userId`. Member D can replace this later.
+Users sign up and sign in (see docs/AUTH.md). Every route under /api needs a signed-in user. In a router add router.use(requireUserId) (from middleware/currentUser.js) and read req.userId, which is now a verified id. The old X-User-Id header is ignored (only the automated tests accept it).
 
 ## Layers (calls go downward only)
 `controllers` -> `services` -> `repositories` -> database. Controllers handle HTTP only. Services hold business rules and receive their repositories as arguments (never `require` a repository inside a service). Never use a repository from a controller.
