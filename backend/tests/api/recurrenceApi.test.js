@@ -90,4 +90,17 @@ describe('Recurrence API', () => {
 
     assert.equal(response.status, 401);
   });
+
+  it('POST /recurrence-rules/run-now creates today\'s occurrence once', async () => {
+    await call('/recurrence-rules', mona.id, {
+      method: 'POST',
+      body: { templateTaskId: template.id, frequency: 'DAILY' },
+    });
+
+    const first = await (await call('/recurrence-rules/run-now', mona.id, { method: 'POST' })).json();
+    const second = await (await call('/recurrence-rules/run-now', mona.id, { method: 'POST' })).json();
+
+    assert.equal(first.created, 1);
+    assert.equal(second.created, 0);
+  });
 });
